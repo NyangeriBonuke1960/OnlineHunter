@@ -1,5 +1,31 @@
-package-lock.json
-.env
+
 db.js
 server.js
 node_modules
+
+# Node.js dependencies
+node_modules/
+package-lock.json
+
+# Build files
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Logs & Debugging
+*.log
+logs/
+npm-debug.log
+yarn-error.log
+
+# System/IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+

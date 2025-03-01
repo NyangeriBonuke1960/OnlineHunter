@@ -1,48 +1,21 @@
-const mongoose = require('mongoose')
+const PropertyService = require("../Application/PropertyService");
 
-const PropertySchema = mongoose.Schema({
-    upi: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
-    },
-    title: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    description: {
-        type: String,
-        trim: true
-    },
-    email: {
-        type: String,
-        match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address']
-    },
-    location: {
-        type: String,
-        trim: true
-    },
-    phoneNumber: {
-        type: String,
-        match: [/^\+?\d{7, 15}$/, 'Please enter a valid phone number'],
-        trim: true
-    },
-    images: [
-        {   type: String,
-            trim: true
-        }
-    ],
-    videos: [
-        {   type: String,
-            trim: true
-        }
-    ]
-},
-{
-    timestamps: true
-})
+class PropertyController{
+    async postProperty(req, res){
+        try{
+            const {upi, title, location, description, email, phoneNumber, role} = req.body;
 
-const Property = mongoose.model('Property', PropertySchema)
-module.exports = Property
+            const images = req.files["images"] ? req.file["images"].map(file => file.path) : []
+            const videos = req.files["videos"] ? req.file["videos"].map(file => file.path) : []
+
+            const property = await PropertyService.createProperty(upi, title, location, description, email, phoneNumber, images, videos, role)
+
+            res.status(201).json({message: "Property created successfully", property})
+        }
+        catch(error){
+            res.status(400).json({error: error.message})
+        }
+    }
+}
+
+module.exports = new PropertyController()
