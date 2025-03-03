@@ -1,13 +1,14 @@
 const PropertyModel = require('../models/PropertyModel')
 
 class PropertyRepository{
-    async save(property){
-        const propertyModel = new PropertyModel(property)
-        return await propertyModel.save()
-    }
-
-    async getAll(){
-        return await PropertyModel.find()
+    async createPropertyAccount(accountData){
+        try{
+            const newAccount = new PropertyModel(accountData)
+            return await newAccount.save()  
+        }
+        catch(error){
+            throw new Error('create account error')
+        }
     }
 }
 

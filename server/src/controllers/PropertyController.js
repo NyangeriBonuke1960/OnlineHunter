@@ -1,14 +1,13 @@
 const PropertyService = require("../Application/PropertyService");
+const { hashPassword } = require("../utils/hashPassword");
 
 class PropertyController{
     async postProperty(req, res){
         try{
-            const {upi, title, location, description, email, phoneNumber, role} = req.body;
+            const { title, email, password } = req.body;
 
-            const images = req.files["images"] ? req.file["images"].map(file => file.path) : []
-            const videos = req.files["videos"] ? req.file["videos"].map(file => file.path) : []
-
-            const property = await PropertyService.createProperty(upi, title, location, description, email, phoneNumber, images, videos, role)
+            const passwordHash = hashPassword(password)
+            const property = await PropertyService.createPropertyAccount({title, email, password: passwordHash})
 
             res.status(201).json({message: "Property created successfully", property})
         }

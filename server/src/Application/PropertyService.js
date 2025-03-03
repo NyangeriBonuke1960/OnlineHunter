@@ -2,18 +2,20 @@ const Property = require('../Domain/Property')
 const PropertyRepository = require('../repositories/PropertyRepository')
 
 class PropertyService{
-    async createProperty(upi, title, location, description, email, phoneNumber, images, videos, role){
-        const property = new Property(upi, title, location, description, email, phoneNumber, images, videos, role)
+    async createPropertyAccount(title, email, password){
+        try{
+            const propertyAccount = new Property(title, email, password)
 
-        if(!property.isValid()){
-            throw new Error('Invalid property data')
+            if(!propertyAccount.isValid()){
+                throw new Error('Invalid property data')
+            }
+
+            const savedPropertyAccount = await PropertyRepository.createPropertyAccount(propertyAccount)
+            return savedPropertyAccount
         }
-
-        return await PropertyRepository.save(property)
-    }
-
-    async getAllProperties(){
-        return await PropertyRepository.getAll()
+        catch(error){
+            throw new Error(`Create property account error: ${error.message}`)
+        }
     }
 }
 

@@ -6,6 +6,20 @@ const PropertySchema = mongoose.Schema({
         required: true,
         trim: true
     },
+    email: {
+        type: String,
+        unique: true,
+        required: true,
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    phoneNumber: {
+        type: String,
+        match: [/^\+?\d{7, 15}$/, 'Please enter a valid phone number'],
+        trim: true
+    },
     location: {
         type: String,
         trim: true
@@ -14,13 +28,8 @@ const PropertySchema = mongoose.Schema({
         type: String,
         trim: true
     },
-    email: {
+    profilePicture: {
         type: String,
-        required: true,
-    },
-    phoneNumber: {
-        type: String,
-        match: [/^\+?\d{7, 15}$/, 'Please enter a valid phone number'],
         trim: true
     },
     images: [
@@ -33,6 +42,11 @@ const PropertySchema = mongoose.Schema({
             trim: true
         }
     ],
+    role: {
+        type: String,
+        enum: ["manager"],
+        default: "manager"
+    }
 },
 {
     timestamps: true
