@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const PropertySchema = mongoose.Schema({
     title: {
         type: String,
+        unique: true,
         required: true,
         trim: true
     },

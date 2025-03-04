@@ -7,7 +7,7 @@ class PropertyRepository{
             return await newAccount.save()  
         }
         catch(error){
-            throw new Error('create account error')
+            throw new Error(`create account error: ${error.message}`)
         }
     }
 }

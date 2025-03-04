@@ -7,6 +7,7 @@ class Property {
         this.title = title;
         this.email = email;
         this.password = password;
+       
     }
 
     isValidEmail() {
