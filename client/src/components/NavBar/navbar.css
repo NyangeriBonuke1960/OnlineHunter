@@ -1,0 +1,50 @@
+/*Desktop */@media(min-width: 1024px){
+    .navbar{
+        padding: 10px;
+        background-color: rgb(139, 50, 139);
+        display: flex;
+        align-items: center;
+        gap: 100px;
+    }
+
+    .search-div{
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex: 2;
+    }
+
+    .search-div input{
+        width: 100%;
+        height: 25px;
+        border-radius: 5px;
+        outline: none;
+        border: 1px solid purple;
+        padding: 0px 10px;
+    }
+
+    .search{
+        color: white;
+        cursor: pointer;
+        font-size: 22px;
+    }
+
+    .search:hover{
+        scale: 1.2;
+    }
+
+    .search:active{
+        scale: 0.8;
+    }
+
+    .account-compare-div{
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+/*tablets */@media(min-width: 768px) and (max-width: 1023px){}
+
+/*mobile phones */@media(max-width: 767px){}

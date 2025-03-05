@@ -1,4 +1,4 @@
-@media(min-width: 1024px){      /*Desktop */
+/*Desktop */ @media(min-width: 1024px){
     .header{
         display: flex;
         justify-content: space-between;
@@ -28,7 +28,7 @@
     }
 }
 
-@media(min-width: 768px) and (max-width: 1023px){ /*tablets */
+/*tablets */@media(min-width: 768px) and (max-width: 1023px){
     .header{
         display: flex;
         justify-content: space-between;
@@ -61,7 +61,7 @@
     }
 }
 
-@media(max-width: 767px){  /*mobile phones */
+/*mobile phones */@media(max-width: 767px){  
     .header{
         display: block;
         background-color: purple;

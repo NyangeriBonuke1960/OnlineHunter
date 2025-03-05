@@ -1,0 +1,5 @@
+/*Desktop */@media(min-width: 1024px){}
+
+/*tablets */@media(min-width: 768px) and (max-width: 1023px){}
+
+/*mobile phones */@media(max-width: 767px){}
