@@ -1,10 +1,10 @@
 /*Desktop */@media(min-width: 1024px){
     .navbar{
         padding: 10px;
-        background-color: rgb(139, 50, 139);
         display: flex;
         align-items: center;
         gap: 100px;
+        background-color: white;
     }
 
     .search-div{
@@ -42,6 +42,24 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+    }
+
+    .pop-hide{
+        width: 100px;
+        padding: 10px;
+        background-color: white;
+        position: absolute;
+        background-color: pink;
+        display: none;
+    }
+
+    .pop-hide.show{
+        display: block;
+    }
+
+    .account-icon{
+        color: purple;
+        cursor: pointer;
     }
 }
 

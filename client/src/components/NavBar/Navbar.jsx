@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './navbar.css'
 import { CiSearch } from "react-icons/ci";
 import { VscAccount } from "react-icons/vsc";
 import { VscGitCompare } from "react-icons/vsc";
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState('false')
+
   return (
     <div className='navbar'>
       <div className='search-div'>
@@ -14,7 +16,14 @@ const Navbar = () => {
       
       <div className='account-compare-div'>
         <div className='account-div'>
-          <VscAccount />
+          <VscAccount className='account-icon' onClick={() => setIsOpen(!isOpen)} />
+          <div className={`pop-hide ${isOpen ? 'show' : ''}`}>
+            <p>My Account</p>
+            <p>My Account</p>
+            <p>My Account</p>
+            <p>My Account</p>
+            <p>My Account</p>
+          </div>
         </div>
 
         <div className='compare-div'>
