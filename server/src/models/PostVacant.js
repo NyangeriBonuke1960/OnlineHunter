@@ -27,10 +27,9 @@ const PostVacantSchema = mongoose.Schema({
             ref: 'User'
         }
     ],
-    comments: [
-
-    ]
 },
 {
     timestamps: true
 })
+
+module.exports = mongoose.model('Post', PostVacantSchema)
