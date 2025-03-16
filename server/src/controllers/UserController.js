@@ -1,6 +1,7 @@
+const TokenService = require('../Application/TokenService')
 const UserService = require('../Application/UserService')
 const bcrypt = require('../utils/bcrypt')
-const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require('../utils/jwt')
+const { generateAccessToken, generateRefreshToken } = require('../utils/jwt')
 
 class UserController{
     async signup(req, res){
@@ -45,8 +46,11 @@ class UserController{
                 return res.status(401).json({message: "Invalid credentials"})
             }
 
-            const accessToken = await generateAccessToken(email)
-            const refreshToken = await generateRefreshToken(email)
+            const payload = {id: user._id, email: user.email}
+            const accessToken = await generateAccessToken(payload)
+            const refreshToken = await generateRefreshToken(payload)
+
+            await TokenService.updateRefreshToken(user, refreshToken)
 
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
@@ -70,19 +74,9 @@ class UserController{
                 return res.status(400).json({message: "Refresh token required"})
             }
 
-            const decoded = await verifyRefreshToken(refreshToken)
-            if(!decoded || !decoded.email){
-                return res.status(400).json({message: "Invalid refresh token"})
-            }
-
-            const user = await UserService.getUserByEmail(decoded.email)
-            if(!user){
-                return res.status(401).json({message: "User not found"})
-            }
-
-            const newAccessToken = await generateAccessToken(user.email)
+            const tokens = await TokenService.refreshToken(refreshToken)
             
-            res.status(200).json({accessToken: newAccessToken})
+            res.status(200).json({message: 'Tokens refreshed', ...tokens})
         }
         catch(error){
             res.status(500).json(error.message)
@@ -91,6 +85,11 @@ class UserController{
 
     async logout(){
         try{
+            const refreshToken = req.cookies.refreshToken
+            const userId = req.user.id
+            
+            await TokenService.blackListRefreshToken(userId, refreshToken)
+
             res.clearCookie("refreshToken", {
                 path: "/api/refresh",
                 httpOnly: true,

@@ -20,7 +20,12 @@ const UserSchema = mongoose.Schema({
         type: String,
         enum: ["user"],
         default: "user" 
-    }
+    },
+    refreshTokens: [{
+        token: {type: String, required: true},
+        createdAt: {type: String, default: Date.now, expires: '7d'},
+        blacklisted: {type: Boolean, default: false}
+    }]
 },
 {
     timestamps: true

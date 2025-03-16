@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
-const generateAccessToken = (email) => {
+const generateAccessToken = (payload) => {
     try{
-        const token = jwt.sign({email}, process.env.ACCESS_TOKEN, {expiresIn: "15m"})
+        const token = jwt.sign(payload, process.env.ACCESS_TOKEN, {expiresIn: "15m"})
         return token
     }
     catch(error){
@@ -41,9 +41,9 @@ const verifyAccessToken = (req, res, next) => {
     }
 }
 
-const generateRefreshToken = (email) => {
+const generateRefreshToken = (payload) => {
     try{
-        const token = jwt.sign({ email }, process.env.REFRESH_TOKEN, {expiresIn: "7d"})
+        const token = jwt.sign(payload, process.env.REFRESH_TOKEN, {expiresIn: "7d"})
         return token
     }
     catch(error){

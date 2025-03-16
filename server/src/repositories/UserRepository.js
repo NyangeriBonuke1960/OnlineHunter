@@ -34,6 +34,76 @@ class UserRepository{
             throw new Error(`Get user by emial error: ${error.message}`)
         }
     }
+
+    async updateToken(user, refreshToken){
+        try{
+            await User.updateOne(
+                {_id: user._id},
+                {$push: {refreshTokens: {token: refreshToken}}}
+            )
+        }
+        catch(error){
+            throw new Error()
+        }
+    }
+
+    async replaceToken(user, oldRefreshToken, newRefreshToken){
+        try{
+            await User.updateOne(
+                {_id: user._id, 'refreshTokens.token': oldRefreshToken},
+                {
+                    $set: {'refreshTokens.$.token': newRefreshToken, 'refreshTokens.$.createdAt': new Date()},
+                    $push: {refreshTokens: {token: newRefreshToken}}
+                }
+            )
+        }
+        catch(error){
+            throw new Error(`Replace token error: ${error.message}`)
+        }
+    }
+
+    async removeToken(user, oldRefreshToken){
+        try{
+            await User.updateOne(
+                {_id: user._id},
+                {$pull: {refreshTokens: {token: oldRefreshToken}}}
+            )
+        }
+        catch(error){
+            throw new Error(`Remove token error: ${error.message}`)
+        }
+    }
+
+    async getUserByIdAndToken(id, oldRefreshToken){
+        try{
+            const user = await User.findOne({
+                _id: id,
+                'refreshTokens.token': oldRefreshToken
+            })
+            if(user){
+                return true
+            }
+            else{
+                return false
+            }
+        }
+        catch(error){
+            throw new Error(`Find user error: ${error.message}`)
+        }
+    }
+
+    async blackListToken(userId, refreshToken){
+        try{
+            const result = await User.updateOne(
+                {_id: userId, 'refreshTokens.token': refreshToken},
+                {$set: {'refreshTokens.$.blackListed': true}}
+            )
+            return result
+        }
+        catch(error){
+            throw new Error(`Black list token error: ${error.message}`)
+        }
+    }
 }
 
 module.exports = new UserRepository
