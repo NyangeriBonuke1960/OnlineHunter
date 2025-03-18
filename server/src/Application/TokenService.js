@@ -15,15 +15,15 @@ class TokenService{
         try{
             const decoded = await verifyRefreshToken(oldRefreshToken)
             if(!decoded || !decoded.email){
-                return res.status(400).json({message: "Invalid refresh token"})
+                throw new Error('Invalid token')
             }
 
             const user = await UserRepository.getUserByIdAndToken(decoded.id, oldRefreshToken)
             if(!user){
-                return res.status(401).json({message: "User not found"})
+                throw new Error('User not found')
             }
-
-            const tokenDoc = user.RefreshTokens.find(t => t.token === oldRefreshToken)
+            
+            const tokenDoc = user.refreshTokens.find(t => t.token === oldRefreshToken)
             if(tokenDoc.blacklisted){
                 throw new Error('Refresh token is blacklisted')
             }
@@ -46,6 +46,12 @@ class TokenService{
     async blackListRefreshToken(userId, refreshToken){
         try{
             const result = await UserRepository.blackListToken(userId, refreshToken)
+            console.log(refreshToken)
+            console.log(result)
+
+            const user = await UserRepository.getUserById(userId)
+            console.log(user)
+
             if(result.modifiedCount === 0){
                 throw new Error(`Refresh token not found or already blacklisted`)
             }

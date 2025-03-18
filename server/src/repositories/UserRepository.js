@@ -16,9 +16,9 @@ class UserRepository{
             if(!email){
                 throw new Error('Email parameter required')
             }
-            const user = await User.findOne({email: email})
+            const user = await User.findOne({email})
 
-            return user !== null
+           return !!user
         }
         catch(error){
             throw new Error(`Check email error : ${error.message}`)
@@ -35,6 +35,16 @@ class UserRepository{
         }
     }
 
+    async getUserById(id){
+        try{
+            const user = await User.findById(id)
+            return user
+        }
+        catch(error){
+            throw new Error(`Get user by id error: ${error.message}`)
+        }
+    }
+
     async updateToken(user, refreshToken){
         try{
             await User.updateOne(
@@ -43,7 +53,7 @@ class UserRepository{
             )
         }
         catch(error){
-            throw new Error()
+            throw new Error(`Upadate token error: ${error.message}`)
         }
     }
 
@@ -53,7 +63,6 @@ class UserRepository{
                 {_id: user._id, 'refreshTokens.token': oldRefreshToken},
                 {
                     $set: {'refreshTokens.$.token': newRefreshToken, 'refreshTokens.$.createdAt': new Date()},
-                    $push: {refreshTokens: {token: newRefreshToken}}
                 }
             )
         }
@@ -80,12 +89,7 @@ class UserRepository{
                 _id: id,
                 'refreshTokens.token': oldRefreshToken
             })
-            if(user){
-                return true
-            }
-            else{
-                return false
-            }
+           return user
         }
         catch(error){
             throw new Error(`Find user error: ${error.message}`)
@@ -95,8 +99,8 @@ class UserRepository{
     async blackListToken(userId, refreshToken){
         try{
             const result = await User.updateOne(
-                {_id: userId, 'refreshTokens.token': refreshToken},
-                {$set: {'refreshTokens.$.blackListed': true}}
+                {_id: userId, 'refreshTokens.token': refreshToken, "refreshTokens.blacklisted": {$ne: true}},
+                {$set: {'refreshTokens.$.blacklisted': true}}
             )
             return result
         }

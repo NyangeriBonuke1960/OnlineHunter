@@ -68,25 +68,35 @@ class UserController{
 
     async refreshToken(req, res){
         try{
-            const refreshToken = req.cookies.refreshToken
+            const getRefreshToken = req.cookies.refreshToken
             
-            if(!refreshToken){
+            if(!getRefreshToken){
                 return res.status(400).json({message: "Refresh token required"})
             }
 
-            const tokens = await TokenService.refreshToken(refreshToken)
+            const tokens = await TokenService.refreshToken(getRefreshToken)
+            const accessToken = tokens.accessToken
+            const refreshToken = tokens.refreshToken
+
+            res.cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: "Strict",
+                path: "/api/refresh"
+            })
+           
             
-            res.status(200).json({message: 'Tokens refreshed', ...tokens})
+            res.status(200).json({message: 'Tokens refreshed', accessToken})
         }
         catch(error){
             res.status(500).json(error.message)
         }
     }
 
-    async logout(){
+    async logout(req, res){
         try{
             const refreshToken = req.cookies.refreshToken
-            const userId = req.user.id
+            const userId = req.body.userId
             
             await TokenService.blackListRefreshToken(userId, refreshToken)
 
@@ -98,7 +108,7 @@ class UserController{
             res.status(200).json({message: "Logged out successfully"})
         }
         catch(error){
-            res.status(500).json({message: error.message})
+            res.status(500).json(error.message)
         }
     }
 }

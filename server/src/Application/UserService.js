@@ -16,13 +16,7 @@ class UserService{
 
     async EmailExists(email){
         try{
-            const isExisting = UserRepository.checkEmail(email)
-            if(isExisting){
-                return true
-            }
-            else{
-                return false
-            }
+            return await UserRepository.checkEmail(email)
         }
         catch(error){
             throw new Error(`Check email error: ${error.message}`)
@@ -31,8 +25,7 @@ class UserService{
 
     async getUserByEmail(email){
         try{
-            const user = UserRepository.getUserUsingEmail(email)
-            return user
+            return await UserRepository.getUserUsingEmail(email)
         }
         catch(error){
             throw new Error(`Get user by email Error: ${error.message}`)
