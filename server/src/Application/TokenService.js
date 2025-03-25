@@ -2,23 +2,23 @@ const UserRepository = require("../repositories/UserRepository")
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require("../utils/jwt")
 
 class TokenService{
-    async updateRefreshToken(user, refreshToken){
+    async updateRefreshTokenService(user, refreshToken){
         try{
-            await UserRepository.updateToken(user, refreshToken)
+            await UserRepository.updateTokenRepository(user, refreshToken)
         }
         catch(error){
             throw new Error(`Update refresh token error: ${error.message}`)
         }
     }
 
-    async refreshToken(oldRefreshToken){
+    async refreshTokenService(oldRefreshToken){
         try{
             const decoded = await verifyRefreshToken(oldRefreshToken)
             if(!decoded || !decoded.email){
                 throw new Error('Invalid token')
             }
 
-            const user = await UserRepository.getUserByIdAndToken(decoded.id, oldRefreshToken)
+            const user = await UserRepository.getUserByIdAndTokenRepository(decoded.id, oldRefreshToken)
             if(!user){
                 throw new Error('User not found')
             }
@@ -32,9 +32,9 @@ class TokenService{
             const newAccessToken = await generateAccessToken(payload)
             const newRefreshToken = await generateRefreshToken(payload)
 
-            await UserRepository.replaceToken(user, oldRefreshToken, newRefreshToken)
+            await UserRepository.replaceTokenRepository(user, oldRefreshToken, newRefreshToken)
 
-            await UserRepository.removeToken(user, oldRefreshToken)
+            await UserRepository.removeTokenRepository(user, oldRefreshToken)
 
             return {accessToken: newAccessToken, refreshToken: newRefreshToken}
         }
@@ -43,13 +43,13 @@ class TokenService{
         }
     }
 
-    async blackListRefreshToken(userId, refreshToken){
+    async blackListRefreshTokenService(userId, refreshToken){
         try{
-            const result = await UserRepository.blackListToken(userId, refreshToken)
+            const result = await UserRepository.blackListTokenRepository(userId, refreshToken)
             console.log(refreshToken)
             console.log(result)
 
-            const user = await UserRepository.getUserById(userId)
+            const user = await UserRepository.getUserByIdRepository(userId)
             console.log(user)
 
             if(result.modifiedCount === 0){

@@ -7,10 +7,11 @@ const router = express.Router()
 
 
 /**User Account */
-router.post('/signup', UserController.signup)
-router.post('/login', UserController.login)
-router.post('/user_refreshtoken', UserController.refreshToken)
-router.post('/logout', UserController.logout)
+router.post('/signup', UserController.signUpController)
+router.post('/login', UserController.loginController)
+router.post('/user_refreshtoken', UserController.refreshTokenController)
+router.post('/logout', UserController.logoutController)
+router.post('/change_password', UserController.changePasswordController)
 
 /**Property Account */
 router.post('/create_property_account', PropertyController.postProperty)
