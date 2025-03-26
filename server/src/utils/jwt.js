@@ -57,8 +57,27 @@ const verifyRefreshToken = (token) => {
         return jwt.verify(token, process.env.REFRESH_TOKEN)
     }
     catch(error){
-        console.error(`Invalid refresh token: ${error.message}`)
+        throw new Error(`Verify refresh token error: ${error.message}`)
     }
 }
 
-module.exports = { generateAccessToken, verifyAccessToken, generateRefreshToken, verifyRefreshToken }
+const generateResetToken = (payload) => {
+    try{
+        const token = jwt.sign(payload, process.env.RESET_TOKEN, {expiresIn: '1h'})
+        return token
+    }
+    catch(error){
+        throw new Error(`Generate reset token error: ${error.message}`)
+    }
+}
+
+const verifyResetToken = (token) => {
+    try{
+        return jwt.verify(token, process.env.RESET_TOKEN)
+    }
+    catch(error){
+        throw new Error(`Verify token error: ${error.message}`)
+    }
+}
+
+module.exports = { generateAccessToken, verifyAccessToken, generateRefreshToken, verifyRefreshToken, generateResetToken, verifyResetToken }

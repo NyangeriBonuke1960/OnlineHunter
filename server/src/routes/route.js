@@ -7,17 +7,19 @@ const router = express.Router()
 
 
 /**User Account */
-router.post('/signup', UserController.signUpController)
-router.post('/login', UserController.loginController)
-router.post('/user_refreshtoken', UserController.refreshTokenController)
-router.post('/logout', UserController.logoutController)
-router.post('/change_password', UserController.changePasswordController)
+router.post('/signup', UserController.signup)
+router.post('/login', UserController.login)
+router.post('/user-refreshtoken', UserController.refreshToken)
+router.post('/logout', UserController.logout)
+router.post('/change-password', UserController.changePassword)
+router.post('/forgot-password', UserController.forgotPassword)
+router.post('/reset-password', UserController.resetPassword)
 
 /**Property Account */
-router.post('/create_property_account', PropertyController.postProperty)
+router.post('/create-property-account', PropertyController.postProperty)
 
 /**Comments */
 router.post('/create_comment', CommentController.postComment)
-router.get('/get_comments/:postId', CommentController.getComments)
+router.get('/get-comments/:postId', CommentController.getComments)
 
 module.exports = router

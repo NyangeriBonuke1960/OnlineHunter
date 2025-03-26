@@ -2,15 +2,6 @@ const UserRepository = require("../repositories/UserRepository")
 const { generateAccessToken, generateRefreshToken, verifyRefreshToken } = require("../utils/jwt")
 
 class TokenService{
-    async updateRefreshTokenService(user, refreshToken){
-        try{
-            await UserRepository.updateTokenRepository(user, refreshToken)
-        }
-        catch(error){
-            throw new Error(`Update refresh token error: ${error.message}`)
-        }
-    }
-
     async refreshTokenService(oldRefreshToken){
         try{
             const decoded = await verifyRefreshToken(oldRefreshToken)
@@ -52,8 +43,12 @@ class TokenService{
             const user = await UserRepository.getUserByIdRepository(userId)
             console.log(user)
 
-            if(result.modifiedCount === 0){
+            if(result.matchedCount === 0){
                 throw new Error(`Refresh token not found or already blacklisted`)
+            }
+
+            if(result.modifiedCount === 0){
+                return {message: 'Token was already blacklisted', alreadyBlackListed: true}
             }
 
             return {message: 'Token blacklisted successfully'}

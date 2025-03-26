@@ -1,25 +1,12 @@
 const TokenService = require('../Application/TokenService')
 const UserService = require('../Application/UserService')
-const bcrypt = require('../utils/bcrypt')
-const { generateAccessToken, generateRefreshToken } = require('../utils/jwt')
 
 class UserController{
-    async signUpController(req, res){
+    async signup(req, res){
         try{
             const {name, email, password} = req.body
 
-            if(!name || !email || !password){
-                return res.status(400).json({message: "All fields are required"})
-            }
-
-            const emailExists = await UserService.checkEmailService(email)
-            if(emailExists){
-                console.log(emailExists)
-                return res.status(409).json({message: 'Email already registered'})
-            }
-
-            const passwordHash = await bcrypt.hashPassword(password)
-            const user = await UserService.signupService(name, email, passwordHash)
+            const user = await UserService.signup(name, email, password)
 
             res.status(201).json({message: "User created successfully", user})
         }
@@ -28,29 +15,11 @@ class UserController{
         }
     }
 
-    async loginController(req, res){
+    async login(req, res){
         try{
             const {email, password} = req.body
 
-            if(!email || !password){
-                return res.status(400).json({message: "All fields are required"})
-            }
-
-            const user = await UserService.getUserByEmailService(email)
-            if(!user){
-                return res.status(401).json({message: "Invalid credentials"})
-            }
-
-            const isPasswordValid = await bcrypt.comparePasswords(password, user.password)
-            if(!isPasswordValid){
-                return res.status(401).json({message: "Invalid credentials"})
-            }
-
-            const payload = {id: user._id, email: user.email}
-            const accessToken = await generateAccessToken(payload)
-            const refreshToken = await generateRefreshToken(payload)
-
-            await TokenService.updateRefreshTokenService(user, refreshToken)
+            const {accessToken, refreshToken, user} = await UserService.login(email, password)
 
             res.cookie("refreshToken", refreshToken, {
                 httpOnly: true,
@@ -62,11 +31,11 @@ class UserController{
             res.status(200).json({message: "Login successful", user, accessToken})
         }
         catch(error){
-            res.status(500).json(error.message)
+            res.status(500).json({error: error.message})
         }
     }
 
-    async refreshTokenController(req, res){
+    async refreshToken(req, res){
         try{
             const getRefreshToken = req.cookies.refreshToken
             
@@ -93,26 +62,26 @@ class UserController{
         }
     }
 
-    async logoutController(req, res){
+    async logout(req, res){
         try{
             const refreshToken = req.cookies.refreshToken
             const userId = req.body.userId
             
-            await TokenService.blackListRefreshTokenService(userId, refreshToken)
+            const result = await TokenService.blackListRefreshTokenService(userId, refreshToken)
 
             res.clearCookie("refreshToken", {
                 path: "/api/refresh",
                 httpOnly: true,
                 secure: true
             })
-            res.status(200).json({message: "Logged out successfully"})
+            res.status(200).json({message: result.alreadyBlackListed ? 'Logged out succesfully: token was already blacklisted' : 'Logged out successfully'})
         }
         catch(error){
             res.status(500).json(error.message)
         }
     }
 
-    async changePasswordController(req, res){
+    async changePassword(req, res){
         try{
             const {userId, oldPassword, newPassword} = req.body
            
@@ -121,6 +90,28 @@ class UserController{
         }
         catch(error){
             res.status(500).json(error)
+        }
+    }
+
+    async forgotPassword(req, res){
+        try{
+            const {email} = req.body
+            const result = await UserService.requestPasswordResetService(email)
+            res.status(200).json(result)
+        }
+        catch(error){
+            res.status(500).json(error.message)
+        }
+    }
+
+    async resetPassword(req, res){
+        try{
+            const {token, newPassword} = req.body
+            const result = await UserService.resetPassword(token, newPassword)
+            res.status(200).json(result)
+        }
+        catch(error){
+            res.status(500).json(error.message)
         }
     }
 

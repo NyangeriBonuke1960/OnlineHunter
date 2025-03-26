@@ -1,35 +1,58 @@
-const User = require('../Domain/User')
 const UserRepository = require('../repositories/UserRepository')
+const { generateAccessToken, generateRefreshToken, generateResetToken, verifyResetToken } = require('../utils/jwt')
 const bcrypt = require('../utils/bcrypt')
+const EmailService = require('./EmailService')
+const TokenService = require('./TokenService')
+const token_expiry = 3600000
 
 class UserService{
-    async signupService(name, email, password){
+    async signup(name, email, password){
         try{
-            const userAccount = new User(name, email, password)
+            if(!name || !email || !password){
+                throw new Error('Name, email or password missing')
+            }
 
-            const savedUserAccount = await UserRepository.signupRepository(userAccount)
-            return savedUserAccount
+            const emailExists = await UserRepository.findByEmail(email)
+            if(emailExists){
+                throw new Error('Email already exists')
+            }
+
+            const passwordHash = await bcrypt.hashPassword(password)
+            
+            
+            return await UserRepository.signup({name, email, password: passwordHash})
         }
         catch(error){
             throw new Error(`Create user Account error ${error.message}`)
         }
     }
 
-    async checkEmailService(email){
+    async login(email, password){
         try{
-            return await UserRepository.checkEmailRepository(email)
-        }
-        catch(error){
-            throw new Error(`Check email error: ${error.message}`)
-        }
-    }
+            if(!email || !password){
+                throw new Error('Invalid credentials')
+            }
 
-    async getUserByEmailService(email){
-        try{
-            return await UserRepository.getUserByEmailRepository(email)
+            const user = await UserRepository.findByEmail(email)
+            if(!user){
+                throw new Error('Invalid credentials')
+            }
+
+            const isPasswordValid = await bcrypt.comparePasswords(password, user.password)
+            if(!isPasswordValid){
+                throw new Error('Invalid credentials')
+            }
+
+            const payload = {id: user._id, email: user.email}
+            const accessToken = await generateAccessToken(payload)
+            const refreshToken = await generateRefreshToken(payload)
+
+            await UserRepository.updateTokenRepository(user, refreshToken)
+
+            return {accessToken, refreshToken, user}
         }
         catch(error){
-            throw new Error(`Get user by email Error: ${error.message}`)
+            throw new Error(`Login error: ${error}`)
         }
     }
 
@@ -61,6 +84,53 @@ class UserService{
         }
         catch(error){
             throw new Error(`Change password service error: ${error}`)
+        }
+    }
+
+    async requestPasswordResetService(email){
+        try{
+            if(!email){
+                throw new Error('Email is required')
+            }
+
+            const user = await UserRepository.getUserByEmailRepository(email)
+
+            if(!user){
+                throw new Error('No account with this email was found')
+            }
+
+            const payload = {id: user._id}
+            const resetToken = await generateResetToken(payload)
+            
+            await UserRepository.storeTokenandExpiryDate(user._id, resetToken, token_expiry)
+
+            await EmailService.sendPasswordResetEmail(email, resetToken)
+
+            return {success: true, message: 'Password reset email sent'}
+        }
+        catch(error){
+            throw new Error(`request reset password error: ${error}`)
+        }
+    }
+
+    async resetPassword(token, newPassword){
+        try{
+            if(!token || !newPassword){
+                throw new Error('token and password are required')
+            }
+
+            const decoded = await verifyResetToken(token)
+
+            const user = await UserRepository.findUserReset(decoded.id, token)
+
+            const hashPassword = await bcrypt.hashPassword(newPassword)
+
+            await UserRepository.saveResetPassword(decoded.id, hashPassword)
+
+            return {success: true, message: 'Password reset successful'}
+        }
+        catch(error){
+            throw new Error(`Password reset failed: ${error.message}`)
         }
     }
 }
