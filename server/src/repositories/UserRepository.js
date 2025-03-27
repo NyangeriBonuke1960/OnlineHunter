@@ -91,15 +91,16 @@ class UserRepository{
                 throw new Error('User id and refresh token required')
             }
 
-           
             const result = await User.updateOne(
-                {  
-                    _id: userId, 
-                    'refreshTokens.token': refreshToken,
-                    'refreshTokens.blacklisted': {$ne: true}
-                },
-                {$set: {'refreshTokens.$.blacklisted': true}}
+                {_id: userId},
+                {$set: { 'refreshTokens.$[elem].blacklisted': true }},
+                {
+                    arrayFilters: [
+                        {'elem.token': refreshToken, 'elem.blacklisted': {$ne: true}}
+                    ]
+                }
             )
+
             return result
         }
         catch(error){

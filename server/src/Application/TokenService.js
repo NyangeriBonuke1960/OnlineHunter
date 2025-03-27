@@ -37,11 +37,6 @@ class TokenService{
     async blackListRefreshTokenService(userId, refreshToken){
         try{
             const result = await UserRepository.blackListTokenRepository(userId, refreshToken)
-            console.log(refreshToken)
-            console.log(result)
-
-            const user = await UserRepository.getUserByIdRepository(userId)
-            console.log(user)
 
             if(result.matchedCount === 0){
                 throw new Error(`Refresh token not found or already blacklisted`)

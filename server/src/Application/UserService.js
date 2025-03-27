@@ -76,14 +76,14 @@ class UserService{
                 throw new Error('Incorrect current password')
             }
 
-            const newPasswordHash = bcrypt.hashPassword(newPassword)
+            const newPasswordHash = await bcrypt.hashPassword(newPassword)
 
             await UserRepository.changePasswordRepository(newPasswordHash, user._id)
 
             return {success: true, message: "Password changed successfully"}
         }
         catch(error){
-            throw new Error(`Change password service error: ${error}`)
+            throw new Error(`Change password service error: ${error.message}`)
         }
     }
 
