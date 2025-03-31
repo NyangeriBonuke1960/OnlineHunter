@@ -93,7 +93,7 @@ class UserService{
                 throw new Error('Email is required')
             }
 
-            const user = await UserRepository.getUserByEmailRepository(email)
+            const user = await UserRepository.findByEmail(email)
 
             if(!user){
                 throw new Error('No account with this email was found')
@@ -123,9 +123,13 @@ class UserService{
 
             const user = await UserRepository.findUserReset(decoded.id, token)
 
+            if(!user){
+                throw new Error('Invalid or expired reset token')
+            }
+
             const hashPassword = await bcrypt.hashPassword(newPassword)
 
-            await UserRepository.saveResetPassword(decoded.id, hashPassword)
+            const userSaved = await UserRepository.saveResetPassword(decoded.id, hashPassword)
 
             return {success: true, message: 'Password reset successful'}
         }

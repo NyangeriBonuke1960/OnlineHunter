@@ -14,13 +14,10 @@ class BcryptHash{
 
     async comparePasswords(password, hashedPassword){
         try{
-            const isMatch = bcrypt.compare(password, hashedPassword)
-            if(isMatch){
-                return true
-            }
-            else{
-                return false
-            }
+           if(!password || !hashedPassword){
+                throw new Error('Password and hashed password required')
+           }
+           return await bcrypt.compare(password, hashedPassword)
         }
         catch(error){
             throw new Error(`Failed dehashing password: ${error.message}`)

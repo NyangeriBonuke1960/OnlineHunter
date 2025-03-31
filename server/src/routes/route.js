@@ -13,7 +13,7 @@ router.post('/user-refreshtoken', UserController.refreshToken)
 router.post('/logout', UserController.logout)
 router.post('/change-password', UserController.changePassword)
 router.post('/forgot-password', UserController.forgotPassword)
-router.post('/reset-password', UserController.resetPassword)
+router.post('/password-reset', UserController.resetPassword)
 
 /**Property Account */
 router.post('/create-property-account', PropertyController.postProperty)

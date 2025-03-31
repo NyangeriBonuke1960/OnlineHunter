@@ -112,7 +112,7 @@ class UserRepository{
         try{
             const result = await User.updateOne(
                 {_id: userId},
-                {$set: {password: passwordHash}}
+                {$set: {password: passwordHash, 'refreshTokens.$[].blacklisted': true}}
             )
 
             if(result.modifiedCount === 0){
@@ -146,15 +146,11 @@ class UserRepository{
 
     async findUserReset(id, token){
         try{
-            const user = await User.findOne({
+            return await User.findOne({
                 _id: id,
                 resetPasswordToken: token,
                 resetPasswordExpires: {$gt: Date.now()}
             })
-            if(!user){
-                throw new Error('Invalid or expired reset token')
-            }
-            return user
         }
         catch(error){
             throw new Error(`Find user rest error: ${error.message}`)
@@ -163,10 +159,9 @@ class UserRepository{
 
     async saveResetPassword(id, hashPassword){
         try{
-            await User.updateOne(
+            return await User.updateOne(
                 {_id: id},
-                {$set: {password: hashPassword}},
-                {$unset: {resetPasswordToken: "", resetPasswordExpires: ""}}
+                {$set: {password: hashPassword, resetPasswordToken: null, resetPasswordExpires: null}},
             )
         }
         catch(error){
