@@ -16,7 +16,8 @@ router.post('/forgot-password', UserController.forgotPassword)
 router.post('/password-reset', UserController.resetPassword)
 
 /**Property Account */
-router.post('/create-property-account', PropertyController.postProperty)
+router.post('/property/signup', PropertyController.signup)
+router.post('/property/login', PropertyController.login)
 
 /**Comments */
 router.post('/create_comment', CommentController.postComment)

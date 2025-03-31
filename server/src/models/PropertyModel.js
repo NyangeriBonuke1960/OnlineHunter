@@ -47,7 +47,12 @@ const PropertySchema = mongoose.Schema({
         type: String,
         enum: ["manager"],
         default: "manager"
-    }
+    },
+    refreshTokens: [{
+        token: {type: String, required: true},
+        blacklisted: {type: Boolean, default: false},
+        createdAt: {type: String, default: Date.now, expires: '7d'}
+    }]
 },
 {
     timestamps: true

@@ -54,7 +54,6 @@ class UserController{
                 path: "/api/refresh"
             })
            
-            
             res.status(200).json({message: 'Tokens refreshed', accessToken})
         }
         catch(error){
